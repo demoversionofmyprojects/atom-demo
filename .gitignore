@@ -1,0 +1,8 @@
+node_modules
+dist
+tsconfig.tsbuildinfo
+
+# Локальні налаштування інструментів розробки — у репозиторій не потрапляють
+.claude
+.agents
+skills-lock.json
