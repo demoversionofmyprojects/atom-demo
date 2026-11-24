@@ -1,8 +1,9 @@
+import { MotionConfig } from 'motion/react';
 import { useEffect, useRef } from 'react';
 import { BottomNav } from './components/BottomNav';
 import { ProductSheet } from './components/ProductSheet';
 import { Toast } from './components/Toast';
-import { revealWithin } from './lib/motion';
+import { prefersReducedMotion, revealWithin } from './lib/motion';
 import { CartScreen } from './screens/CartScreen';
 import { CatalogScreen } from './screens/CatalogScreen';
 import { FavoritesScreen } from './screens/FavoritesScreen';
@@ -33,19 +34,22 @@ export default function App() {
   });
 
   return (
-    <div className="app">
-      <main
-        ref={mainRef}
-        // Де є View Transitions, екрани змінює браузер (transitionScreen), і CSS-вхід вимикається
-        className="app__main screen-enter"
-        key={tab}
-        style={{ '--dir': direction } as React.CSSProperties}
-      >
-        <Screen />
-      </main>
-      <BottomNav />
-      <ProductSheet />
-      <Toast />
-    </div>
+    // Motion підпорядковується тому ж режиму руху, що й CSS (системне налаштування або ?motion=full)
+    <MotionConfig reducedMotion={prefersReducedMotion() ? 'always' : 'never'}>
+      <div className="app">
+        <main
+          ref={mainRef}
+          // Де є View Transitions, екрани змінює браузер (transitionScreen), і CSS-вхід вимикається
+          className="app__main screen-enter"
+          key={tab}
+          style={{ '--dir': direction } as React.CSSProperties}
+        >
+          <Screen />
+        </main>
+        <BottomNav />
+        <ProductSheet />
+        <Toast />
+      </div>
+    </MotionConfig>
   );
 }

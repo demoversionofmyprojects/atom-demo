@@ -5,4 +5,8 @@ tsconfig.tsbuildinfo
 # Локальні налаштування інструментів розробки — у репозиторій не потрапляють
 .claude
 .agents
+.codex
+.github/agents
+.github/hooks
+.github/skills
 skills-lock.json

@@ -4,17 +4,23 @@ import { ArrowRightIcon } from '../components/Icons';
 import { ProductCard } from '../components/ProductCard';
 import { SplitText } from '../components/SplitText';
 import { FAMILY_HINTS, FAMILY_LABELS } from '../data/dictionaries';
+import { KIND_COLORS } from '../data/notes';
 import { PRODUCTS } from '../data/products';
 import type { Family } from '../data/types';
 import { formatPrice } from '../lib/format';
 import { prefersReducedMotion, setMorphOrigin, useScrollFrame } from '../lib/motion';
 import { useApp } from '../store/AppContext';
-import { DEFAULT_FILTERS } from '../store/filters';
+import { freshFilters } from '../store/filters';
 
 const FEATURED = PRODUCTS.filter((p) => p.featured);
 const BESTSELLERS = PRODUCTS.filter((p) => p.bestseller)
   .sort((a, b) => b.popularity - a.popularity)
   .slice(0, 4);
+// Склад колекції: скільки ароматів кожної родини — смуга спектра на головній
+const COMPOSITION = (Object.keys(FAMILY_LABELS) as Family[])
+  .map((fam) => ({ fam, count: PRODUCTS.filter((p) => p.family === fam).length }))
+  .filter((c) => c.count > 0);
+
 const HOME_FAMILIES: Family[] = ['woody', 'amber', 'floral', 'gourmand', 'citrus', 'chypre'];
 
 const TITLE_LEAD = 'Аромат, що звучить';
@@ -26,7 +32,7 @@ export function HomeScreen() {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const openCatalog = (family?: Family) => {
-    setFilters({ ...DEFAULT_FILTERS, families: family ? [family] : [] });
+    setFilters((f) => ({ ...freshFilters(f.ml), families: family ? [family] : [] }));
     setTab('catalog');
   };
 
@@ -77,7 +83,6 @@ export function HomeScreen() {
           <img className="hero__logo" src="./logo.png" alt="Atom Parfums" />
           <span className="hero__glint" aria-hidden />
         </div>
-        <p className="eyebrow hero__eyebrow">Розпив нішевої та люксової парфумерії</p>
         <h1 className="hero__title" aria-label={`${TITLE_LEAD} ${TITLE_ACCENT}`}>
           <span aria-hidden>
             <SplitText text={TITLE_LEAD} />{' '}
@@ -86,15 +91,31 @@ export function HomeScreen() {
             </em>
           </span>
         </h1>
+        <div className="composition" aria-label="Склад колекції" role="group">
+          <div className="composition__band">
+            {COMPOSITION.map(({ fam, count }) => (
+              <button
+                key={fam}
+                className="composition__seg"
+                style={{ flexGrow: count, background: KIND_COLORS[fam] }}
+                onClick={() => openCatalog(fam)}
+                aria-label={`${FAMILY_LABELS[fam]}: ${count}`}
+              />
+            ))}
+          </div>
+          <p className="composition__caption">
+            Склад колекції: {PRODUCTS.length} ароматів, {COMPOSITION.length} родин
+          </p>
+        </div>
         <p className="hero__text">
-          Atom Parfums — аромати на розпив в атомайзерах 2, 5 і 10 мл. Спробуйте культові та нішеві парфуми,
-          перш ніж обирати повний флакон: шукайте за нотами чи родиною аромату й формуйте замовлення просто в
-          Telegram.
+          Розпив нішевої та люксової парфумерії в атомайзерах 2, 5 і 10 мл. Спробуйте культові аромати, перш
+          ніж обирати повний флакон: шукайте за нотами чи родиною й формуйте замовлення просто в Telegram.
         </p>
         <button className="btn btn--primary hero__cta" onClick={() => openCatalog()}>
           Перейти до каталогу <ArrowRightIcon size={18} />
         </button>
       </section>
+
 
       <section className="section">
         <div className="section__head reveal">
@@ -135,6 +156,7 @@ export function HomeScreen() {
         <div className="families">
           {HOME_FAMILIES.map((fam) => (
             <button key={fam} className="family reveal" onClick={() => openCatalog(fam)}>
+              <span className="family__band" style={{ background: KIND_COLORS[fam] }} aria-hidden />
               <span className="family__name">{FAMILY_LABELS[fam]}</span>
               <span className="family__hint">{FAMILY_HINTS[fam]}</span>
               <span className="family__count">{PRODUCTS.filter((p) => p.family === fam).length}</span>
@@ -146,11 +168,11 @@ export function HomeScreen() {
 
       <section className="section">
         <div className="section__head reveal">
-          <h2 className="section__title">Хіти розпиву</h2>
+          <h2 className="section__title">Варто спробувати</h2>
           <button
             className="link-btn"
             onClick={() => {
-              setFilters(DEFAULT_FILTERS);
+              setFilters((f) => freshFilters(f.ml));
               setTab('catalog');
             }}
           >

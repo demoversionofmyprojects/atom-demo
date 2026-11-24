@@ -1,6 +1,6 @@
-import { FAMILY_LABELS, GENDER_LABELS } from '../data/dictionaries';
-import { BRANDS, PRICE_BOUNDS } from '../data/products';
-import type { Family, Gender } from '../data/types';
+import { GENDER_LABELS } from '../data/dictionaries';
+import { BRANDS, priceBounds } from '../data/products';
+import type { Gender } from '../data/types';
 import { formatPrice } from '../lib/format';
 import { haptic } from '../lib/telegram';
 import { useApp } from '../store/AppContext';
@@ -11,17 +11,19 @@ const toggle = <T,>(list: T[], value: T) => (list.includes(value) ? list.filter(
 const PRICE_STEP = 10;
 const PRICE_GAP = 50;
 
-// Пресети для ціни розпиву 5 мл
-const PRICE_PRESETS: [string, [number, number]][] = [
-  ['До 400 ₴', [PRICE_BOUNDS.min, 400]],
-  ['400 — 600 ₴', [400, 600]],
-  ['Від 600 ₴', [600, PRICE_BOUNDS.max]],
-];
 
 export function FilterPanel() {
   const { filters, setFilters } = useApp();
   const [lo, hi] = filters.price;
+  const PRICE_BOUNDS = priceBounds(filters.ml);
   const span = PRICE_BOUNDS.max - PRICE_BOUNDS.min;
+  // Пресети ділять діапазон обраного об'єму на третини, округлені до 50 ₴
+  const cut = (k: number) => Math.round((PRICE_BOUNDS.min + (span * k) / 3) / 50) * 50;
+  const PRICE_PRESETS: [string, [number, number]][] = [
+    [`До ${formatPrice(cut(1))}`, [PRICE_BOUNDS.min, cut(1)]],
+    [`${formatPrice(cut(1))} — ${formatPrice(cut(2))}`, [cut(1), cut(2)]],
+    [`Від ${formatPrice(cut(2))}`, [cut(2), PRICE_BOUNDS.max]],
+  ];
 
   const setPrice = (next: [number, number]) => setFilters((f) => ({ ...f, price: next }));
   const pick = <K extends 'brands' | 'families' | 'genders'>(key: K, value: (typeof filters)[K][number]) => {
@@ -63,22 +65,6 @@ export function FilterPanel() {
       </section>
 
       <section className="filters__group">
-        <h3 className="section-label">Родина аромату</h3>
-        <div className="chips chips--wrap">
-          {(Object.keys(FAMILY_LABELS) as Family[]).map((fam) => (
-            <button
-              key={fam}
-              className={`chip${filters.families.includes(fam) ? ' is-active' : ''}`}
-              onClick={() => pick('families', fam)}
-              aria-pressed={filters.families.includes(fam)}
-            >
-              {FAMILY_LABELS[fam]}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="filters__group">
         <h3 className="section-label">Бренд</h3>
         <div className="chips chips--wrap">
           {BRANDS.map((b) => (
@@ -96,7 +82,7 @@ export function FilterPanel() {
 
       <section className="filters__group">
         <div className="filters__price-head">
-          <h3 className="section-label">Ціна за 5 мл</h3>
+          <h3 className="section-label">Ціна за {filters.ml} мл</h3>
           <span className="filters__price-value">
             {formatPrice(lo)} — {formatPrice(hi)}
           </span>

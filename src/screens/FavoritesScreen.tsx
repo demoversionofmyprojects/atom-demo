@@ -1,19 +1,16 @@
+import { AnimatePresence, motion } from 'motion/react';
 import { EmptyState } from '../components/EmptyState';
 import { HeartIcon } from '../components/Icons';
 import { PageHeader } from '../components/PageHeader';
 import { ProductCard } from '../components/ProductCard';
 import { getProduct } from '../data/products';
 import type { Product } from '../data/types';
-import { useRef } from 'react';
 import { plural } from '../lib/format';
-import { useFlip } from '../lib/motion';
 import { useApp } from '../store/AppContext';
 
 export function FavoritesScreen() {
   const { favorites, setTab } = useApp();
   const items = favorites.map(getProduct).filter((p): p is Product => !!p);
-  const gridRef = useRef<HTMLDivElement>(null);
-  useFlip(gridRef, favorites.join());
 
   return (
     <div className="screen">
@@ -26,10 +23,20 @@ export function FavoritesScreen() {
         }
       />
       {items.length ? (
-        <div className="grid" ref={gridRef}>
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+        <div className="grid">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {items.map((p) => (
+              <motion.div
+                key={p.id}
+                layout
+                className="grid__cell"
+                exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.2 } }}
+                transition={{ layout: { type: 'spring', stiffness: 380, damping: 38 } }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       ) : (
         <EmptyState

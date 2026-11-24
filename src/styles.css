@@ -119,13 +119,6 @@ svg {
 }
 
 /* ===== Типографіка й дрібні елементи ===== */
-.eyebrow {
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold-deep);
-  font-weight: 600;
-}
 
 .section-label {
   font-size: 11px;
@@ -293,9 +286,7 @@ svg {
   width: 56px;
   height: 1px;
   margin-top: 10px;
-  /* Тонка золота лінія з повільним відблиском — фоновий «живий» шар */
-  background: linear-gradient(90deg, var(--gold) 0%, var(--gold) 40%, #f3e2bf 50%, var(--gold) 60%, var(--gold) 100%);
-  background-size: 300% 100%;
+  background: var(--line-strong);
 }
 
 .hero__logo {
@@ -582,19 +573,6 @@ svg {
   font-size: 15px;
 }
 
-.badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: var(--text);
-  color: var(--gold-soft);
-}
 
 .fav-btn {
   position: absolute;
@@ -724,16 +702,7 @@ svg {
   flex-wrap: wrap;
 }
 
-.chips--scroll {
-  overflow-x: auto;
-  margin: -8px calc(var(--gutter) * -1) 0;
-  padding: 0 var(--gutter);
-  scrollbar-width: none;
-}
 
-.chips--scroll::-webkit-scrollbar {
-  display: none;
-}
 
 .chip {
   flex-shrink: 0;
@@ -804,8 +773,7 @@ svg {
   .catalog .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .catalog .filter-btn,
-  .catalog .chips--scroll {
+  .catalog .filter-btn {
     display: none;
   }
 }
@@ -1075,27 +1043,8 @@ svg {
   margin-bottom: 24px;
 }
 
-.notes {
-  list-style: none;
-  margin: 0 0 24px;
-  padding: 0;
-  border-top: 1px solid var(--line);
-}
 
-.notes__row {
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 14px;
-}
 
-.notes__level {
-  color: var(--gold-deep);
-  font-weight: 600;
-  font-size: 12.5px;
-}
 
 .volumes {
   display: grid;
@@ -1483,4 +1432,620 @@ body.no-scroll .toast {
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+/* ===== Світ «Хроматограма аромату» =====
+   Колір у контенті — лише кольори нот і родин; золото — лише вибір і дії;
+   Forum для назв ароматів (перегукується з літерами логотипа), Onest для інтерфейсу. */
+
+:root {
+  --serif: 'Forum', 'Times New Roman', Georgia, serif;
+  --sans: 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+::selection {
+  background: rgba(176, 141, 87, 0.28);
+  color: var(--text);
+}
+
+input {
+  caret-color: var(--gold);
+}
+
+/* Forum має одне накреслення — синтетичне потовщення спотворює його */
+.card__name,
+.row__name,
+.detail__name,
+.page-header__title,
+.section__title,
+.hero__title,
+.spotlight__name,
+.family__name,
+.cart-item__name,
+.empty__title,
+.sheet__title,
+.summary__total strong {
+  font-weight: 400;
+}
+
+/* Золото — лише для вибору й дій */
+.card__brand,
+.detail__brand {
+  color: var(--text-2);
+}
+
+.family__count {
+  color: var(--text-3);
+}
+
+.demo-note__mark {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+
+/* Табличні цифри у всіх цінах і підсумках */
+.card__price,
+.row__price,
+.volume__price,
+.cart-item__sum,
+.summary,
+.buy-bar__price,
+.filters__price-value,
+.results-bar,
+.ml-switch {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Перемикач об'єму для всієї сітки */
+.ml-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.ml-switch__item {
+  position: relative;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: color var(--d-std) var(--ease-std);
+}
+
+.ml-switch__item.is-active {
+  color: #fbf6ea;
+}
+
+.ml-switch__pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  background: var(--text);
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.ml-switch__label {
+  position: relative;
+}
+
+
+
+
+
+
+
+
+
+/* Хроматограма: компактна смуга в картці */
+.chroma--strip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.chroma__layer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* Чим стійкіший шар, тим більше місця: база важча за верх */
+.chroma__layer:nth-last-child(1) {
+  flex: 1.5;
+}
+
+.chroma__layer:nth-last-child(2) {
+  flex: 1.25;
+}
+
+.chroma__layer i {
+  flex: 1;
+  display: block;
+}
+
+.card__media {
+  display: flex;
+}
+
+.card .chroma--strip {
+  width: 24px;
+  padding: 12px 0 12px 12px;
+}
+
+.card__bottle {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.card__price {
+  margin: 0;
+  color: var(--text);
+}
+
+.grid__cell {
+  min-width: 0;
+}
+
+.grid__cell > .card {
+  height: 100%;
+}
+
+/* Хроматограма: розгорнута на сторінці товару — кожна нота свій рядок */
+.chroma--full {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chroma__level {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.chroma__group ul {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.chroma__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+}
+
+.chroma__band {
+  display: block;
+  width: 28px;
+  align-self: stretch;
+  transform-origin: top;
+}
+
+.chroma__row:first-child .chroma__band {
+  border-radius: 4px 4px 0 0;
+}
+
+.chroma__row:last-child .chroma__band {
+  border-radius: 0 0 4px 4px;
+}
+
+.chroma__row:only-child .chroma__band {
+  border-radius: 4px;
+}
+
+.chroma__note {
+  font-size: 15px;
+}
+
+/* Щільний список */
+.results-bar {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.results-bar > span:first-child {
+  margin-right: auto;
+}
+
+.view-switch {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+}
+
+.view-switch button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--text-3);
+  transition: background-color var(--d-std) var(--ease-std), color var(--d-std) var(--ease-std);
+}
+
+.view-switch button.is-active {
+  background: var(--text);
+  color: #fbf6ea;
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.row__open {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 72px;
+  padding: 8px 52px 8px 8px;
+}
+
+.row__media {
+  width: 48px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.row__img {
+  width: 100%;
+  height: 100%;
+}
+
+.row .chroma--strip {
+  width: 8px;
+  align-self: stretch;
+}
+
+.row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.row__name {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__price {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.row__fav {
+  position: absolute;
+  right: 6px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
+/* Родини на головній: колір родини — той самий, що в спектрі й хроматограмах */
+.family__band {
+  display: block;
+  width: 28px;
+  height: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+/* Назва аромату — до двох рядків замість обрізання на першому */
+.card__name {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.3em;
+}
+
+/* Світлі ноти (мускус) не зливаються з молочним фоном */
+.chroma__band,
+.chroma__layer i {
+  box-shadow: inset 0 0 0 1px rgba(31, 29, 27, 0.07);
+}
+
+/* У Forum немає курсиву, а золото — не для тексту: акцент заголовка лише графітом */
+.hero__title em {
+  font-style: normal;
+  color: var(--text);
+}
+
+/* ===== Спектр родин: суцільна смуга зі шкалою =====
+   Підписи чергуються над і під смугою, кожен стоїть на своїй поділці. */
+.spectrum {
+  display: flex;
+  margin-top: -4px;
+}
+
+.spectrum__item {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 76px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: opacity var(--d-std) var(--ease-std);
+}
+
+.spectrum__band {
+  display: block;
+  height: 18px;
+  margin: 0 0.5px;
+  transform-origin: center;
+}
+
+.spectrum__item:first-child .spectrum__band {
+  border-radius: 4px 0 0 4px;
+}
+
+.spectrum__item:last-child .spectrum__band {
+  border-radius: 0 4px 4px 0;
+}
+
+/* Поділка шкали: тонкий штрих від смуги до підпису */
+.spectrum__item::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  height: 6px;
+  background: var(--text-3);
+}
+
+.spectrum__item.is-below::after {
+  top: calc(50% + 11px);
+}
+
+.spectrum__item.is-above::after {
+  bottom: calc(50% + 11px);
+}
+
+.spectrum__label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-2);
+}
+
+.spectrum__item.is-below .spectrum__label {
+  bottom: 0;
+}
+
+.spectrum__item.is-above .spectrum__label {
+  top: 0;
+}
+
+.spectrum__item.is-active .spectrum__label {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.spectrum__item.is-active .spectrum__band {
+  box-shadow: 0 0 0 1.5px var(--gold);
+  position: relative;
+  z-index: 1;
+}
+
+.spectrum__item.is-dimmed {
+  opacity: 0.4;
+}
+
+/* ===== Хроматограма в картці: ширша смуга зі шкалою верх / серце / база ===== */
+.card .chroma--strip {
+  position: relative;
+  width: 42px;
+  padding: 14px 0 14px 14px;
+}
+
+.card .chroma__layer {
+  position: relative;
+  overflow: visible;
+}
+
+.card .chroma__layer i:first-child {
+  border-radius: 3px 3px 0 0;
+}
+
+.card .chroma__layer i:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.card .chroma__layer i:only-child {
+  border-radius: 3px;
+}
+
+/* Вертикальна лабораторна шкала праворуч від смуги з поділками на межах шарів */
+.card .chroma--strip::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  right: -6px;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.card .chroma__layer::before,
+.card .chroma__layer:last-child::after {
+  content: '';
+  position: absolute;
+  right: -9px;
+  width: 6px;
+  height: 1px;
+  background: var(--text-3);
+}
+
+.card .chroma__layer::before {
+  top: 0;
+}
+
+.card .chroma__layer:last-child::after {
+  bottom: 0;
+}
+
+/* На телефоні картка нижча: назва й ціна першого ряду видно над навігацією */
+@media (max-width: 639px) {
+  .card__media {
+    aspect-ratio: auto;
+    height: 156px;
+  }
+}
+
+/* ===== Хроматограма в шторці: вісь від верху до бази, межі шарів, ширина за стійкістю ===== */
+.chroma--full {
+  position: relative;
+  gap: 0;
+  padding-left: 18px;
+}
+
+.chroma--full::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.chroma__group {
+  position: relative;
+  padding: 12px 0 14px;
+  border-top: 1px solid var(--line);
+}
+
+.chroma__group:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+/* Поділка осі на початку кожного шару */
+.chroma__group::before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  top: -1px;
+  width: 9px;
+  height: 1px;
+  background: var(--text-2);
+}
+
+.chroma__group:nth-child(1) .chroma__band {
+  width: 22px;
+}
+
+.chroma__group:nth-child(2) .chroma__band {
+  width: 30px;
+}
+
+.chroma__group:nth-child(3) .chroma__band {
+  width: 38px;
+}
+
+.chroma__row {
+  min-height: 30px;
+}
+
+/* ===== Заголовки розділів — звичайні заголовки замість розрядженої капітелі ===== */
+.section-label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+/* ===== Склад колекції на головній ===== */
+.composition {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.composition__band {
+  display: flex;
+  height: 28px;
+  gap: 1px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.composition__seg {
+  flex-basis: 0;
+  min-width: 10px;
+  transition: filter var(--d-std) var(--ease-std);
+}
+
+.composition__seg:active {
+  filter: brightness(0.9);
+}
+
+.composition__caption {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* Склад колекції — частина першого екрана головної, одразу під заголовком */
+.hero .composition {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Контраст: графіт на золоті лічильників (~6:1) і темніший сірий у метаданих картки (~5.5:1) */
+.bottom-nav__count,
+.filter-btn__count {
+  color: var(--text);
+}
+
+.card__meta {
+  color: var(--text-2);
 }

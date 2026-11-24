@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
+import { useEffect, type RefObject } from 'react';
 import { flushSync } from 'react-dom';
 
 /**
@@ -105,46 +105,6 @@ export function revealWithin(root: ParentNode | null) {
   }
   const io = getObserver();
   pending.forEach((el) => io.observe(el));
-}
-
-/* ---------- FLIP: плавне перестроювання сітки ---------- */
-
-/**
- * Коли змінюється склад або порядок дочірніх елементів (data-flip-id),
- * картки, що лишилися, плавно переїжджають на нові місця, а не стрибають.
- */
-export function useFlip(container: RefObject<HTMLElement>, signature: string) {
-  const prev = useRef(new Map<string, { x: number; y: number }>());
-
-  useLayoutEffect(() => {
-    const root = container.current;
-    if (!root) return;
-    const origin = root.getBoundingClientRect();
-    const next = new Map<string, { x: number; y: number }>();
-    const reduce = prefersReducedMotion();
-
-    (Array.from(root.children) as HTMLElement[]).forEach((el, index) => {
-      const id = el.dataset.flipId;
-      if (!id) return;
-      const r = el.getBoundingClientRect();
-      const pos = { x: r.left - origin.left, y: r.top - origin.top };
-      next.set(id, pos);
-      const before = prev.current.get(id);
-      if (!before || reduce) return;
-      const dx = before.x - pos.x;
-      const dy = before.y - pos.y;
-      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
-      // Легкий каскад робить перестроювання «хореографією», а не одночасним ривком
-      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], {
-        duration: DUR.slow,
-        delay: Math.min(index, 8) * 18,
-        easing: EASE.emph,
-        fill: 'backwards',
-      });
-    });
-
-    prev.current = next;
-  }, [container, signature]);
 }
 
 /* ---------- Спільний елемент: флакон летить з картки в шторку ---------- */

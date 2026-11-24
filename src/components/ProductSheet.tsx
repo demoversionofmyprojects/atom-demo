@@ -7,16 +7,11 @@ import { flyToCart, morphIn, morphOut } from '../lib/motion';
 import { haptic } from '../lib/telegram';
 import { useApp } from '../store/AppContext';
 import { BottleArt } from './BottleArt';
+import { Chromatogram } from './Chromatogram';
 import { FavoriteButton } from './FavoriteButton';
 import { CheckIcon } from './Icons';
 import { RollingNumber } from './RollingNumber';
 import { Sheet } from './Sheet';
-
-const NOTE_LEVELS = [
-  { key: 'top', label: 'Верхні ноти' },
-  { key: 'heart', label: 'Ноти серця' },
-  { key: 'base', label: 'Базові ноти' },
-] as const;
 
 export function ProductSheet() {
   const { openedProductId } = useApp();
@@ -29,8 +24,9 @@ export function ProductSheet() {
 }
 
 function ProductDetails({ product, open }: { product: Product; open: boolean }) {
-  const { closeProduct, addToCart } = useApp();
-  const [volumeIdx, setVolumeIdx] = useState(product.defaultVolume);
+  const { closeProduct, addToCart, filters } = useApp();
+  // Відкриваємо на тому об'ємі, який покупець обрав у каталозі
+  const [volumeIdx, setVolumeIdx] = useState(() => Math.max(0, product.volumes.findIndex((v) => v.ml === filters.ml)));
   const [added, setAdded] = useState(false);
   const [morphed, setMorphed] = useState(false);
   const addedTimer = useRef<number>();
@@ -112,14 +108,7 @@ function ProductDetails({ product, open }: { product: Product; open: boolean }) 
           <p className="detail__desc">{product.description}</p>
 
           <h3 className="section-label">Піраміда аромату</h3>
-          <ol className="notes">
-            {NOTE_LEVELS.filter(({ key }) => product.notes[key].length).map(({ key, label }, i) => (
-              <li className="notes__row" key={key} style={{ '--n': i } as React.CSSProperties}>
-                <span className="notes__level">{label}</span>
-                <span className="notes__list">{product.notes[key].join(', ')}</span>
-              </li>
-            ))}
-          </ol>
+          <Chromatogram product={product} variant="full" />
 
           <h3 className="section-label">Об’єм розпиву</h3>
           <VolumePicker product={product} value={volumeIdx} onChange={setVolumeIdx} />

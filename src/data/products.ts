@@ -1,3 +1,4 @@
+import { unmappedNotes } from './notes';
 import type { Product, Volume } from './types';
 
 /**
@@ -334,10 +335,18 @@ export const BRANDS = Array.from(new Set(PRODUCTS.map((p) => p.brand))).sort();
 
 export const getProduct = (id: string) => PRODUCTS.find((p) => p.id === id);
 
-/** Об'єм і ціна, що показуються в картці та використовуються у фільтрі ціни. */
-export const cardVolume = (p: Product) => p.volumes[p.defaultVolume] ?? p.volumes[0];
+export type DecantMl = (typeof DECANT_SIZES)[number];
 
-export const PRICE_BOUNDS = {
-  min: Math.floor(Math.min(...PRODUCTS.map((p) => cardVolume(p).price)) / 50) * 50,
-  max: Math.ceil(Math.max(...PRODUCTS.map((p) => cardVolume(p).price)) / 50) * 50,
-};
+/** Об'єм і ціна для розпиву, обраного глобальним перемикачем каталогу. */
+export const volumeFor = (p: Product, ml: DecantMl) => p.volumes.find((v) => v.ml === ml) ?? p.volumes[0];
+
+/** Межі фільтра ціни для обраного об'єму, округлені до 50 ₴. */
+export function priceBounds(ml: DecantMl) {
+  const prices = PRODUCTS.map((p) => volumeFor(p, ml).price);
+  return { min: Math.floor(Math.min(...prices) / 50) * 50, max: Math.ceil(Math.max(...prices) / 50) * 50 };
+}
+
+if (import.meta.env.DEV) {
+  const missing = unmappedNotes(PRODUCTS);
+  console.assert(!missing.length, 'Ноти без родини в notes.ts:', missing);
+}

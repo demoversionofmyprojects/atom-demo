@@ -99,3 +99,12 @@ export const CheckIcon = (p: IconProps) => (
     <path className="check-path" d="m5 12.5 4.5 4.5L19 7.5" />
   </svg>
 );
+
+export const ListIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M9 6h11M9 12h11M9 18h11" />
+    <rect x="4" y="5" width="2" height="2" rx="0.5" />
+    <rect x="4" y="11" width="2" height="2" rx="0.5" />
+    <rect x="4" y="17" width="2" height="2" rx="0.5" />
+  </svg>
+);

@@ -108,8 +108,8 @@ export function Sheet({ open, onClose, title, children, footer, className = '' }
       onClose();
       return;
     }
-    // Повертаємо на місце з м'якою пружністю
-    sheet.style.transition = 'transform 520ms cubic-bezier(0.34, 1.3, 0.64, 1)';
+    // Повертаємо на місце з плавним гальмуванням
+    sheet.style.transition = 'transform 520ms cubic-bezier(0.16, 1, 0.3, 1)';
     sheet.style.transform = '';
     if (backdropRef.current) backdropRef.current.style.opacity = '';
   };

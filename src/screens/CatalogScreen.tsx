@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EmptyState } from '../components/EmptyState';
 import { FilterPanel } from '../components/FilterPanel';
-import { CloseIcon, FilterIcon, SearchIcon } from '../components/Icons';
+import { AnimatePresence, motion } from 'motion/react';
+import { CloseIcon, FilterIcon, GridIcon, ListIcon, SearchIcon } from '../components/Icons';
 import { PageHeader } from '../components/PageHeader';
 import { ProductCard } from '../components/ProductCard';
 import { RollingNumber } from '../components/RollingNumber';
 import { Sheet } from '../components/Sheet';
-import { FAMILY_LABELS } from '../data/dictionaries';
+import { SpectrumFilter } from '../components/SpectrumFilter';
+import { VolumeSwitch } from '../components/VolumeSwitch';
 import { PRODUCTS } from '../data/products';
-import type { Family } from '../data/types';
 import { plural } from '../lib/format';
-import { useFlip, useScrollFrame } from '../lib/motion';
+import { useScrollFrame } from '../lib/motion';
 import { useApp } from '../store/AppContext';
-import { DEFAULT_FILTERS, activeFilterCount, applyFilters } from '../store/filters';
+import { activeFilterCount, applyFilters, freshFilters } from '../store/filters';
 
 const AROMAS: [string, string, string] = ['аромат', 'аромати', 'ароматів'];
 
@@ -35,10 +36,9 @@ export function CatalogScreen() {
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
 
   const results = useMemo(() => applyFilters(PRODUCTS, filters), [filters]);
-  const gridRef = useRef<HTMLDivElement>(null);
-  useFlip(gridRef, results.map((p) => p.id).join());
+  const [dense, setDense] = useState(false);
   const activeCount = activeFilterCount(filters);
-  const resetAll = () => setFilters(DEFAULT_FILTERS);
+  const resetAll = () => setFilters((f) => freshFilters(f.ml));
 
   // Панель пошуку отримує «скляний» фон і тінь, коли прилипає до верху екрана
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -51,15 +51,13 @@ export function CatalogScreen() {
   const showHints = !filters.query && !searchFocused;
   const hint = useRotatingHint(showHints);
 
-  const toggleFamily = (fam: Family) =>
-    setFilters((f) => ({
-      ...f,
-      families: f.families.includes(fam) ? f.families.filter((x) => x !== fam) : [...f.families, fam],
-    }));
-
   return (
     <div className="screen catalog">
-      <PageHeader title="Каталог" subtitle={`${PRODUCTS.length} ${plural(PRODUCTS.length, AROMAS)} у демо-колекції`} />
+      <PageHeader
+        title="Каталог"
+        subtitle={`${PRODUCTS.length} ${plural(PRODUCTS.length, AROMAS)}`}
+        aside={<VolumeSwitch />}
+      />
 
       <div className="toolbar" ref={toolbarRef}>
         <label className="search">
@@ -101,18 +99,7 @@ export function CatalogScreen() {
         </button>
       </div>
 
-      <div className="chips chips--scroll" aria-label="Швидкий вибір родини">
-        {(Object.keys(FAMILY_LABELS) as Family[]).map((fam) => (
-          <button
-            key={fam}
-            className={`chip${filters.families.includes(fam) ? ' is-active' : ''}`}
-            onClick={() => toggleFamily(fam)}
-            aria-pressed={filters.families.includes(fam)}
-          >
-            {FAMILY_LABELS[fam]}
-          </button>
-        ))}
-      </div>
+      <SpectrumFilter />
 
       <div className="catalog__layout">
         <aside className="catalog__aside">
@@ -137,13 +124,32 @@ export function CatalogScreen() {
                 Скинути все
               </button>
             )}
+            <span className="view-switch" role="radiogroup" aria-label="Вигляд каталогу">
+              <button role="radio" aria-checked={!dense} aria-label="Сітка" className={dense ? '' : 'is-active'} onClick={() => setDense(false)}>
+                <GridIcon size={18} />
+              </button>
+              <button role="radio" aria-checked={dense} aria-label="Щільний список" className={dense ? 'is-active' : ''} onClick={() => setDense(true)}>
+                <ListIcon size={18} />
+              </button>
+            </span>
           </div>
 
           {results.length ? (
-            <div className="grid" ref={gridRef}>
-              {results.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+            // Motion перестроює сітку при фільтрації: картки, що лишились, з'їжджаються, решта тане
+            <div className={dense ? 'rows' : 'grid'} key={dense ? 'rows' : 'grid'}>
+              <AnimatePresence mode="popLayout" initial={false}>
+                {results.map((p) => (
+                  <motion.div
+                    key={p.id}
+                    layout
+                    className="grid__cell"
+                    exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.2 } }}
+                    transition={{ layout: { type: 'spring', stiffness: 380, damping: 38 } }}
+                  >
+                    <ProductCard product={p} dense={dense} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           ) : (
             <EmptyState

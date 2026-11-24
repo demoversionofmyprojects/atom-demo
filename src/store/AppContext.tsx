@@ -54,7 +54,9 @@ const AppContext = createContext<AppState | null>(null);
 const sameLine = (a: CartItem, productId: string, ml: number) => a.productId === productId && a.ml === ml;
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [tab, setTabState] = useState<Tab>('home');
+  // ?tab=catalog відкриває застосунок одразу на потрібній вкладці (посилання для клієнта, знімки)
+  const initialTab = TAB_ORDER.find((t) => t === new URLSearchParams(location.search).get('tab')) ?? 'home';
+  const [tab, setTabState] = useState<Tab>(initialTab);
   const [openedProductId, setOpenedProductId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>(() =>
     load<string[]>('favorites', []).filter((id) => getProduct(id)),
@@ -69,7 +71,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => save('favorites', favorites), [favorites]);
   useEffect(() => save('cart', cart), [cart]);
 
-  const tabRef = useRef<Tab>('home');
+  const tabRef = useRef<Tab>(initialTab);
   const setTab = useCallback((next: Tab) => {
     const current = tabRef.current;
     haptic.select();
